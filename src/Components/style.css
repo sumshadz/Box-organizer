@@ -1,0 +1,141 @@
+.navBar{
+	width: 100%;
+	height: 100px;
+	background-color: rgb(183, 31, 138);
+	position: fixed;
+	top: 0;
+	box-shadow: 0px 4px 6px -2px rgba(15, 14, 14, 0.2);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.navHead{
+	color: white;
+	text-transform: uppercase;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.triggerPlacement{
+	width: 200px;
+	height: 60px;
+	margin: 0 20px;
+	background-color: transparent;
+	border: 2px solid white;
+	color: white;
+	border-radius: 10px;
+	font-size: medium;
+}
+.page1Container{
+	width: 100%;
+	background-color: #282c34;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	/* background-color: aquamarine; */
+}
+.left{
+	width: 40%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 40px;
+	/* background-color: blueviolet; */
+	
+}
+.left>h2{
+	color: white;
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.left>form{
+	/* margin: 10px; */
+	width: 90%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	margin: 20px 0;
+}
+.formInputs{
+	width: 80%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-bottom: 20px;
+}
+.formInputsAttributes{
+	width: 80%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.boxAttributes{
+	width: 26%;
+	margin: 0 5px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+label{
+	color: white;
+	font-size:larger;
+	margin-bottom: 5px;
+}
+.labelSpan{
+	font-size: small;
+}
+input{
+	width: 100%;
+	height: 40px;
+	border-radius: 10px;
+	border: none;
+	/* padding: 0 10px; */
+}
+.formButtons{
+	width: 80%;
+	display: flex;
+	flex-direction: row;
+	justify-content:space-around;
+	align-items: center;
+	margin: 30px 0;
+}
+.formButtons>button{
+	width: 47%;
+	height: 40px;
+	border-radius: 10px;
+	border: 2px solid white;
+	background-color: transparent;
+	color: white;
+	font-size: medium;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+.formButtons>button:hover, .triggerPlacement:hover{
+	background-color: white;
+	border: none;
+	color: black;
+}
+.right{
+	width: 60%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	/* background-color: aqua; */
+}
+.remove{
+	font-size: small;
+	border: none;
+	background-color: transparent;
+	color: rgb(20, 152, 235);
+	cursor: pointer;
+}
+.boxListContainer{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 0 20px;
+}
