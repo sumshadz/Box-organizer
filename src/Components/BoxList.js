@@ -43,6 +43,7 @@ const BoxList = (props) => {
 	<div className='boxListContainer'>
 		<Paper sx={{ width: '100%' }}>
       <TableContainer sx={{ maxHeight: 400 }}>
+        {/* Table to display list of boxes */}
       <Table sx={{ minWidth: 550 }} style={{height:"100px"}} aria-label="simple table">
         <TableHead>
           <TableRow>
