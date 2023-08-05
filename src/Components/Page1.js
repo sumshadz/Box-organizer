@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AppContext } from './userContext';
 import BoxList from './BoxList';
 import ArrangedBoxList from './ArrangedBoxList';
@@ -17,24 +17,8 @@ const Page1 = () => {
 			address:"",
 		}
 	);
-	const[boxList, setBoxList] = useState([]);
-	const[isLoading, setIsLoading] = useState(true);
-	const[reRender, setReRender] = useState(false);
-	const { state, url } = useContext(AppContext);
-
-	//Function that returns list of boxes
-	const getBoxList = async() =>{
-		try{
-			let response = await fetch(url+"boxes");
-			if(!response.ok) throw new Error('Failed to fetch');
-			const data = await response.json();
-			setBoxList(data);
-			setIsLoading(false);
-		}
-		catch(error){
-			console.log(error);
-		}
-	}
+	const { state} = useContext(AppContext);
+	const {boxList, setBoxList} = useContext(AppContext);
 
 	//function to handle form inputs
 	const handleChange = (e) =>{
@@ -58,35 +42,23 @@ const Page1 = () => {
 	}
 
 	//function to add box into list of boxes
-	const handleSubmit = async(e) =>{
+	const handleSubmit = (e) =>{
 		e.preventDefault();
-    try {
-		//API call to add box
-      const response = await fetch(url+'boxes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit the form');
-      }
-
-	  handleReset();
-	  setReRender(!reRender);
-	  window.alert('Box Added!');
-    } catch (error) {
-      console.log(error);
-    }
+		const temp={
+			id:formData.id,
+			height:formData.height,
+			width:formData.width,
+			length:formData.length,
+			weight:formData.weight,
+			address:formData.address,
+		}
+		console.log(temp);
+		const updatedBoxList = [...boxList, temp];
+		handleReset()
+		setBoxList(updatedBoxList); 
+		console.log(boxList);
+		window.alert("box added");
 	}
-
-	//useEffect will call getBoxList function whenever state of reRender variable changes. And state of reRender variable changes only when new box is added through 'handleSubmit'
-	useEffect(()=>{
-		getBoxList();
-	},[reRender])
-
 
   return (
 	<>
@@ -139,7 +111,7 @@ const Page1 = () => {
       {/* This section will show list of boxes if 'state' is false else will show arranged boxes
       */}
 		<div className='right'>
-        {isLoading ? <p>Loading...</p> : state===true?<ArrangedBoxList/>:<BoxList rows={boxList}/>}
+        {state===true?<ArrangedBoxList/>:<BoxList/>}
         </div>
 
 	</div>

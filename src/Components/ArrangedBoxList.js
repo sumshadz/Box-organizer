@@ -14,10 +14,8 @@ import './style.css';
 const ArrangedBoxList = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [row, setRow] = React.useState([]);
   const [height, setHeight] = React.useState(0);
-	const [isLoading, setIsLoading] = useState(true);
-	const { url } = useContext(AppContext);
+	const { boxList, arrangedBoxList, setArrangedBoxList } = useContext(AppContext);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -28,39 +26,77 @@ const ArrangedBoxList = () => {
     setPage(0);
   };
 
-  //Function to get list of boxes after arranging them in stack
-  const getBoxList = async() =>{
-		try{
-			let response = await fetch(url+"arrange-boxes");
-			if(!response.ok) throw new Error('Failed to fetch');
-			const data = await response.json();
-			setRow(data);
-			setIsLoading(false);
-		}
-		catch(error){
-			console.log(error);
-		}
-	}
-
-  //Function to get height of stack after arranging the boxes in stack
-  const getHeightOfStack = async() =>{
-    try{
-			let response = await fetch(url+"height-of-stack");
-			if(!response.ok) throw new Error('Failed to fetch');
-			const data = await response.json();
-			setHeight(data);
-		}
-		catch(error){
-			console.log(error);
-		}
+  // Function to arrange the boxes
+  function arrangeBoxes(boxes) {
+    let rotatedBoxes = [];
+    //store all the rotation of array
+  for (const box of boxes) {
+    const { height, width, length, weight, address } = box;
+    rotatedBoxes.push({ id: box.id, height, width:Math.max(width, length), length:Math.min(width, length), weight, address });
+    rotatedBoxes.push({ id: box.id, height: width, width: Math.max(length, height), length: Math.min(length, height), weight, address });
+    rotatedBoxes.push({ id: box.id, height: length, width: Math.max(width, height), length: Math.min(width, height), weight, address });
   }
+
+  
+  rotatedBoxes.sort((a, b) => (b.width * b.length) - (a.width * a.length));
+
+  // Create an array to store the maximum height of the stack for each box
+  const maxHeight = new Array(rotatedBoxes.length).fill(0);
+
+  // Initialize the array with the height of each box
+  for (let i = 0; i < rotatedBoxes.length; i++) {
+    maxHeight[i] = rotatedBoxes[i].height;
+  }
+
+
+  for (let i = 1; i < rotatedBoxes.length; i++) {
+    for (let j = 0; j < i; j++) {
+      // Check if the current box can be placed on top of the j-th box.
+      if (
+        rotatedBoxes[i].width < rotatedBoxes[j].width &&
+        rotatedBoxes[i].length < rotatedBoxes[j].length
+      ) {
+        // Update the maximum height if placing the current box on top of j-th box yields a taller stack.
+        maxHeight[i] = Math.max(maxHeight[i], maxHeight[j] + rotatedBoxes[i].height);
+      }
+    }
+  }
+
+  // Find the maximum height
+  const maxStackHeight = Math.max(...maxHeight);
+setHeight(maxStackHeight);
+
+
+  // let stack = [];
+  // let currentIndex = maxHeight.indexOf(maxStackHeight);
+  // while (currentIndex >= 0) {
+  //   stack.unshift(rotatedBoxes[currentIndex]);
+  //   for (let j = currentIndex - 1; j >= 0; j--) {
+  //     if (
+  //       rotatedBoxes[currentIndex].width < rotatedBoxes[j].width &&
+  //       rotatedBoxes[currentIndex].length < rotatedBoxes[j].length &&
+  //       maxHeight[currentIndex] === maxHeight[j] + rotatedBoxes[currentIndex].height
+  //     ) {
+  //       currentIndex = j;
+  //       break;
+  //     }
+  //   }
+  //   currentIndex--;
+  // }
+  // console.log(stack);
+  // return stack;
+  }
+
+  //Function to get list of boxes after arranging them in stack
+  const getBoxList = () =>{
+		const arrangedBoxes = arrangeBoxes(boxList);
+    setArrangedBoxList([]);
+	}
   
   useEffect(()=>{
 		getBoxList();
-    getHeightOfStack();
 	},[])
 
-  if(isLoading) return <p>Loading ...</p>
 
   return (
 	<div className='boxListContainer'>
@@ -80,7 +116,7 @@ const ArrangedBoxList = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {row.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          {arrangedBoxList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 		  .map((row,index) => (
             <TableRow
               key={row.id}
@@ -91,7 +127,7 @@ const ArrangedBoxList = () => {
               </TableCell>
               <TableCell align="right">{row.height}</TableCell>
 			  <TableCell align="right">{row.width}</TableCell>
-			  <TableCell align="right">{row.depth}</TableCell>
+			  <TableCell align="right">{row.length}</TableCell>
               <TableCell align="right">{row.weight}</TableCell>
               <TableCell align="right">{row.address}</TableCell>
             </TableRow>
@@ -102,7 +138,7 @@ const ArrangedBoxList = () => {
 	<TablePagination
 	    rowsPerPageOptions={[5, 25, 100]}
         component="div"
-        count={row.length}
+        count={arrangedBoxList.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

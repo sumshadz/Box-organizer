@@ -7,12 +7,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
+import { useState, useContext } from 'react';
+import { AppContext } from './userContext';
 import './style.css';
 
-const BoxList = (props) => {
-	const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [row, setRow] = React.useState(props.rows);
+const BoxList = () => {
+	const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const {boxList, setBoxList} = useContext(AppContext);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -22,22 +24,10 @@ const BoxList = (props) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  const handleRemove = async(index) => {
-    try {
-      const boxId=row[index].id;
-      const response = await fetch(`http://localhost:3000/boxes/${boxId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to remove box');
-      }
-      window.alert('Successfully deleted!');
-    } catch (error) {
-      window.alert('Unable to delete');
-    }
+  const handleRemove = async(id) => {
+    const updatedBoxList = boxList.filter((box) => box.id !== id);
+    setBoxList(updatedBoxList);
+    window.alert("box removed");
   };
   return (
 	<div className='boxListContainer'>
@@ -57,7 +47,7 @@ const BoxList = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {row.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+          {boxList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 		  .map((row,index) => (
             <TableRow
               key={row.id}
@@ -68,10 +58,10 @@ const BoxList = (props) => {
               </TableCell>
               <TableCell align="right">{row.height}</TableCell>
 			  <TableCell align="right">{row.width}</TableCell>
-			  <TableCell align="right">{row.depth}</TableCell>
+			  <TableCell align="right">{row.length}</TableCell>
               <TableCell align="right">{row.weight}</TableCell>
               <TableCell align="right">{row.address}</TableCell>
-			  <TableCell align="right"><button className='remove' onClick={()=>handleRemove(index)}>Remove</button></TableCell>
+			  <TableCell align="right"><button className='remove' onClick={()=>handleRemove(row.id)}>Remove</button></TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -80,7 +70,7 @@ const BoxList = (props) => {
 	<TablePagination
 	    rowsPerPageOptions={[5, 25, 100]}
         component="div"
-        count={row.length}
+        count={boxList.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
