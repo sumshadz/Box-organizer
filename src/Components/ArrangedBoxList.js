@@ -39,58 +39,63 @@ const ArrangedBoxList = () => {
 
   
   rotatedBoxes.sort((a, b) => (b.width * b.length) - (a.width * a.length));
-
+// console.log(rotatedBoxes);
   // Create an array to store the maximum height of the stack for each box
-  const maxHeight = new Array(rotatedBoxes.length).fill(0);
+  const maxHeight = new Array(rotatedBoxes.length);
 
   // Initialize the array with the height of each box
   for (let i = 0; i < rotatedBoxes.length; i++) {
-    maxHeight[i] = rotatedBoxes[i].height;
+    let obj = {
+      height: rotatedBoxes[i].height,
+      visitedBoxes: [rotatedBoxes[i].id]
+    }
+    maxHeight[i] = obj;
   }
-
 
   for (let i = 1; i < rotatedBoxes.length; i++) {
     for (let j = 0; j < i; j++) {
       // Check if the current box can be placed on top of the j-th box.
       if (
+        rotatedBoxes[i].id!==rotatedBoxes[j].id &&
         rotatedBoxes[i].width < rotatedBoxes[j].width &&
         rotatedBoxes[i].length < rotatedBoxes[j].length
       ) {
         // Update the maximum height if placing the current box on top of j-th box yields a taller stack.
-        maxHeight[i] = Math.max(maxHeight[i], maxHeight[j] + rotatedBoxes[i].height);
+        if(
+          !maxHeight[j].visitedBoxes.includes(rotatedBoxes[i].id) && 
+          maxHeight[i].height< maxHeight[j].height + rotatedBoxes[i].height){
+
+          maxHeight[i].height=maxHeight[j].height + rotatedBoxes[i].height;
+          maxHeight[i].visitedBoxes=[...maxHeight[j].visitedBoxes,rotatedBoxes[i].id];
+        }
       }
     }
   }
 
   // Find the maximum height
-  const maxStackHeight = Math.max(...maxHeight);
-setHeight(maxStackHeight);
+  let maxStackHeight = {height:0,visitedBoxes:[]};
+  for(let i=0;i<maxHeight.length;i++){
+    if(maxStackHeight.height<maxHeight[i].height) {
+      maxStackHeight.height=maxHeight[i].height;
+      maxStackHeight.visitedBoxes=maxHeight[i].visitedBoxes;
+    }
+  }
+setHeight(maxStackHeight.height);
+//reversing the array to get the box to be placed at top on first index
+maxStackHeight.visitedBoxes.reverse();
 
-
-  // let stack = [];
-  // let currentIndex = maxHeight.indexOf(maxStackHeight);
-  // while (currentIndex >= 0) {
-  //   stack.unshift(rotatedBoxes[currentIndex]);
-  //   for (let j = currentIndex - 1; j >= 0; j--) {
-  //     if (
-  //       rotatedBoxes[currentIndex].width < rotatedBoxes[j].width &&
-  //       rotatedBoxes[currentIndex].length < rotatedBoxes[j].length &&
-  //       maxHeight[currentIndex] === maxHeight[j] + rotatedBoxes[currentIndex].height
-  //     ) {
-  //       currentIndex = j;
-  //       break;
-  //     }
-  //   }
-  //   currentIndex--;
-  // }
-  // console.log(stack);
-  // return stack;
+let arrangedBoxes=[];
+for(let i=0;i<maxStackHeight.visitedBoxes.length;i++){
+  let box = boxes.find(box => box.id === maxStackHeight.visitedBoxes[i]);
+  arrangedBoxes.push(box);
+}
+return arrangedBoxes;
   }
 
   //Function to get list of boxes after arranging them in stack
   const getBoxList = () =>{
 		const arrangedBoxes = arrangeBoxes(boxList);
-    setArrangedBoxList([]);
+    setArrangedBoxList(arrangedBoxes);
 	}
   
   useEffect(()=>{
@@ -115,6 +120,7 @@ setHeight(maxStackHeight);
             <TableCell align="right">Box Weight</TableCell>
           </TableRow>
         </TableHead>
+        {console.log(arrangedBoxList)}
         <TableBody>
           {arrangedBoxList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 		  .map((row,index) => (
@@ -150,3 +156,4 @@ setHeight(maxStackHeight);
 }
 
 export default ArrangedBoxList;
+
